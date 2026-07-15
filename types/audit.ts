@@ -90,6 +90,16 @@ export interface AuditPhoto {
   createdAt: string;
 }
 
+export interface Community {
+  id: string;
+  name: string;
+  slug: string;
+  goalHomes: number | null;
+  createdAt: string;
+}
+
+export type UserRole = "admin" | "auditor" | "client";
+
 export interface Audit {
   id: string;
   homeId: string | null;
@@ -100,6 +110,7 @@ export interface Audit {
   builder: string | null;
   neighborhood: string | null;
   lotNumber: string | null;
+  communityId: string | null;
   auditorId: string | null;
   auditorName?: string | null;
   auditDate: string;

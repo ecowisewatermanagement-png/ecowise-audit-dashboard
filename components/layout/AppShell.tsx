@@ -39,7 +39,7 @@ export function AppShell({
           <BrandMark />
         </div>
         <div className="flex-1 overflow-y-auto py-4">
-          <SidebarNav />
+          <SidebarNav role={user.role} />
         </div>
       </aside>
 
@@ -54,7 +54,7 @@ export function AppShell({
             <BrandMark />
           </div>
           <div className="py-4">
-            <SidebarNav onNavigate={() => setMobileOpen(false)} />
+            <SidebarNav role={user.role} onNavigate={() => setMobileOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>

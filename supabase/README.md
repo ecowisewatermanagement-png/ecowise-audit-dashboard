@@ -10,14 +10,16 @@ Create a free project at [supabase.com/dashboard](https://supabase.com/dashboard
 
 Open the SQL editor in your Supabase project and run [`schema.sql`](./schema.sql). It creates:
 
-- `profiles` — one row per user, with an `admin` / `auditor` role
-- `audits` — one row per home audit (searchable columns + jsonb detail)
+- `profiles` — one row per user, with an `admin` / `auditor` / `client` role
+- `communities` — one row per audited development (e.g. "Promontory"); `community_access` scopes which communities a `client`-role user can see
+- `audits` — one row per home audit (searchable columns + jsonb detail), tagged with a `community_id`
 - `audit_photos` — Storage object references, grouped by category
 - `recommendation_templates` — the admin-editable recommendation library
 - `settings` — the singleton row of water cost / rebate values used in calculations
+- `get_community_dashboard(community_id)` — the aggregate-only RPC the client portal reads from (no row-level access to individual audits)
 - the `audit-photos` Storage bucket, with RLS policies on every table
 
-It's safe to re-run — every statement is `if not exists` / `on conflict do nothing`.
+It's safe to re-run — every statement is `if not exists` / `on conflict do nothing`. If you already ran an earlier version of this schema, you can instead run just [`migrations/002_communities.sql`](./migrations/002_communities.sql).
 
 ## 3. Create your first admin user
 
@@ -33,8 +35,8 @@ From Project Settings → API, copy into `.env.local` (see `.env.example`):
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=   # "Publishable key"
+SUPABASE_SECRET_KEY=             # "Secret key" — needed to invite clients
 ```
 
 ## 5. Regenerate types (optional, once your schema stabilizes)

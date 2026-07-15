@@ -9,6 +9,7 @@ export default async function DashboardLayout({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.role === "client") redirect("/community");
 
   return <AppShell user={user}>{children}</AppShell>;
 }

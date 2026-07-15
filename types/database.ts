@@ -2,8 +2,22 @@
 // CLI once the project is linked — see supabase/README.md §5.
 import type { ExteriorAudit, InteriorAudit, Recommendation, AuditCalculations } from "./audit";
 
-export type UserRole = "admin" | "auditor";
+export type UserRole = "admin" | "auditor" | "client";
+export type ClientType = "homeowner" | "hoa_director";
 export type AuditStatus = "draft" | "in_progress" | "completed" | "reviewed";
+
+export interface CommunityDashboardStats {
+  homes_audited: number;
+  total_gallons_saved_per_year: number;
+  total_dollar_savings_per_year: number;
+  avg_dollar_savings_per_home: number;
+  avg_efficiency_score: number;
+  homes_with_smart_controllers: number;
+  efficient_toilets_installed: number;
+  efficient_showerheads_installed: number;
+  leak_repairs: number;
+  total_rebate_opportunities: number;
+}
 export type PhotoCategory =
   | "front_yard"
   | "backyard"
@@ -22,7 +36,11 @@ export interface Database {
         Row: {
           id: string;
           full_name: string | null;
+          email: string | null;
           role: UserRole;
+          client_type: ClientType | null;
+          home_address: string | null;
+          requested_community: string | null;
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["profiles"]["Row"]> & {
@@ -42,6 +60,7 @@ export interface Database {
           builder: string | null;
           neighborhood: string | null;
           lot_number: string | null;
+          community_id: string | null;
           auditor_id: string | null;
           audit_date: string;
           status: AuditStatus;
@@ -114,8 +133,40 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["settings"]["Row"]>;
         Relationships: [];
       };
+      communities: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          goal_homes: number | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["communities"]["Row"]> & {
+          name: string;
+          slug: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["communities"]["Row"]>;
+        Relationships: [];
+      };
+      community_access: {
+        Row: {
+          user_id: string;
+          community_id: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["community_access"]["Row"]
+        > & { user_id: string; community_id: string };
+        Update: Partial<Database["public"]["Tables"]["community_access"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_community_dashboard: {
+        Args: { p_community_id: string };
+        Returns: CommunityDashboardStats[];
+      };
+    };
   };
 }

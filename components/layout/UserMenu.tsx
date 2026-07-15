@@ -39,7 +39,7 @@ export function UserMenu({ user }: { user: CurrentUser }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 outline-none hover:bg-sidebar-accent">
+      <DropdownMenuTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 outline-none hover:bg-muted">
         <Avatar className="size-8">
           <AvatarFallback className="text-xs">
             {initials(user.fullName, user.email)}
@@ -59,11 +59,15 @@ export function UserMenu({ user }: { user: CurrentUser }) {
           {user.email}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem render={<a href="/settings" />}>
-          <User />
-          Account settings
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        {user.role !== "client" && (
+          <>
+            <DropdownMenuItem render={<a href="/settings" />}>
+              <User />
+              Account settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem onClick={signOut} variant="destructive">
           <LogOut />
           Sign out

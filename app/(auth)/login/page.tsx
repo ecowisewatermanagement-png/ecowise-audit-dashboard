@@ -16,9 +16,15 @@ export default function LoginPage() {
         <LoginForm />
       </Suspense>
       <p className="text-muted-foreground mt-6 text-center text-sm">
-        No account yet?{" "}
+        EcoWise staff, no account yet?{" "}
         <Link href="/signup" className="text-primary underline">
           Create one
+        </Link>
+      </p>
+      <p className="text-muted-foreground mt-2 text-center text-sm">
+        Community member?{" "}
+        <Link href="/join" className="text-primary underline">
+          Sign up here
         </Link>
       </p>
     </>
