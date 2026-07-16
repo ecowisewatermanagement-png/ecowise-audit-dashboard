@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { LogOut, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -28,13 +27,10 @@ function initials(name: string | null, email: string | null) {
 }
 
 export function UserMenu({ user }: { user: CurrentUser }) {
-  const router = useRouter();
-
   async function signOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    window.location.href = "https://ecowisewater.com";
   }
 
   return (
