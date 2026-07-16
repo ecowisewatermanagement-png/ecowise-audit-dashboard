@@ -4,12 +4,13 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuditTable } from "@/components/audit/AuditTable";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import type { AuditListRow } from "@/types/audit";
 
 export const metadata: Metadata = { title: "Audits" };
 
 export default async function AuditsPage() {
-  const supabase = await createClient();
+  const [user, supabase] = await Promise.all([getCurrentUser(), createClient()]);
 
   const { data: audits } = await supabase
     .from("audits")
@@ -61,7 +62,7 @@ export default async function AuditsPage() {
         </Button>
       </div>
 
-      <AuditTable audits={rows} />
+      <AuditTable audits={rows} isAdmin={user?.role === "admin"} />
     </div>
   );
 }

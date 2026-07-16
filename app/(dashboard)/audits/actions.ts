@@ -176,3 +176,19 @@ export async function finalizeAudit(
   revalidatePath("/dashboard");
   return { success: true };
 }
+
+/** Admin-only — RLS also enforces this at the database level. */
+export async function deleteAudit(id: string): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  if (user?.role !== "admin") {
+    return { success: false, message: "Only admins can delete audits." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("audits").delete().eq("id", id);
+
+  if (error) return { success: false, message: error.message };
+  revalidatePath("/audits");
+  revalidatePath("/dashboard");
+  return { success: true };
+}

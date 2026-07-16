@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { ArrowUpDown, Download, Search } from "lucide-react";
+import { ArrowUpDown, Download, Search, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { AuditListRow } from "@/types/audit";
 import { AuditStatusBadge } from "./AuditStatusBadge";
 import { exportToCsv } from "@/lib/csv-export";
+import { deleteAudit } from "@/app/(dashboard)/audits/actions";
 
 type SortKey = keyof Pick<
   AuditListRow,
@@ -38,11 +51,32 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "efficiencyScore", label: "Score" },
 ];
 
-export function AuditTable({ audits }: { audits: AuditListRow[] }) {
+export function AuditTable({
+  audits,
+  isAdmin = false,
+}: {
+  audits: AuditListRow[];
+  isAdmin?: boolean;
+}) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("auditDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete(id: string, address: string) {
+    setDeletingId(id);
+    startTransition(async () => {
+      const result = await deleteAudit(id);
+      setDeletingId(null);
+      if (result.success) {
+        toast.success(`Deleted audit for ${address}`);
+      } else {
+        toast.error(result.message);
+      }
+    });
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -143,6 +177,7 @@ export function AuditTable({ audits }: { audits: AuditListRow[] }) {
                 </TableHead>
               ))}
               <TableHead>Status</TableHead>
+              {isAdmin && <TableHead className="w-10" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -171,12 +206,50 @@ export function AuditTable({ audits }: { audits: AuditListRow[] }) {
                 <TableCell>
                   <AuditStatusBadge status={audit.status} />
                 </TableCell>
+                {isAdmin && (
+                  <TableCell>
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive"
+                            disabled={isPending && deletingId === audit.id}
+                            aria-label={`Delete audit for ${audit.address}`}
+                          />
+                        }
+                      >
+                        <Trash2 className="size-4" />
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this audit?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This permanently deletes the audit for{" "}
+                            <strong>{audit.address}</strong>, including its photos
+                            and recommendations. This can&apos;t be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            variant="destructive"
+                            onClick={() => handleDelete(audit.id, audit.address)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={COLUMNS.length + 1}
+                  colSpan={COLUMNS.length + (isAdmin ? 2 : 1)}
                   className="text-muted-foreground py-8 text-center"
                 >
                   No audits match your search.
