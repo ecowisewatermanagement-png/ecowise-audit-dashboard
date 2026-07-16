@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -18,9 +18,8 @@ import {
   FieldError,
 } from "@/components/ui/field";
 
-export function LoginForm() {
+export function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -40,7 +39,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push(searchParams.get("redirectTo") ?? "/dashboard");
+    router.push(redirectTo ?? "/dashboard");
     router.refresh();
   }
 
