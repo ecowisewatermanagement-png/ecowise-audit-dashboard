@@ -4,6 +4,7 @@ import {
   BarChart3,
   Settings2,
   Building2,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,5 +20,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Audits", href: "/audits", icon: ClipboardList },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Communities", href: "/communities", icon: Building2, adminOnly: true },
+  { label: "Clients", href: "/clients", icon: Users, adminOnly: true },
   { label: "Settings", href: "/settings", icon: Settings2 },
 ];
