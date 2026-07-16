@@ -15,6 +15,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { EditClientDialog } from "./EditClientDialog";
 import type { ClientType } from "@/types/database";
 
 export interface CommunityWithClients {
@@ -26,6 +27,7 @@ export interface CommunityWithClients {
     fullName: string | null;
     email: string | null;
     clientType: ClientType | null;
+    homeAddress: string | null;
   }[];
 }
 
@@ -118,6 +120,13 @@ export function CommunityList({
                       >
                         {client.clientType === "hoa_director" ? "HOA director" : "Homeowner"}
                       </Badge>
+                      <EditClientDialog
+                        userId={client.userId}
+                        fullName={client.fullName}
+                        email={client.email}
+                        clientType={client.clientType}
+                        homeAddress={client.homeAddress}
+                      />
                       <Button
                         type="button"
                         variant="ghost"

@@ -7,8 +7,10 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   communitySchema,
   inviteClientSchema,
+  editClientSchema,
   type CommunityInput,
   type InviteClientInput,
+  type EditClientInput,
 } from "@/lib/validations/community";
 
 type ActionResult = { success: true } | { success: false; message: string };
@@ -109,6 +111,54 @@ export async function approveClientRequest(
   if (error) return { success: false, message: error.message };
 
   await supabase.from("profiles").update({ requested_community: null }).eq("id", userId);
+
+  revalidatePath("/communities");
+  return { success: true };
+}
+
+/** Admin-only edit of a client's profile — keeps their login email in sync with `profiles.email`. */
+export async function updateClientProfile(
+  userId: string,
+  input: EditClientInput
+): Promise<ActionResult> {
+  await requireAdmin();
+  const values = editClientSchema.parse(input);
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (err) {
+    return { success: false, message: (err as Error).message };
+  }
+
+  const { data: existing, error: fetchError } = await admin
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .single();
+
+  if (fetchError || !existing) {
+    return { success: false, message: fetchError?.message ?? "Client not found" };
+  }
+
+  if (values.email !== existing.email) {
+    const { error: authError } = await admin.auth.admin.updateUserById(userId, {
+      email: values.email,
+    });
+    if (authError) return { success: false, message: authError.message };
+  }
+
+  const { error } = await admin
+    .from("profiles")
+    .update({
+      full_name: values.fullName,
+      email: values.email,
+      client_type: values.clientType,
+      home_address: values.homeAddress || null,
+    })
+    .eq("id", userId);
+
+  if (error) return { success: false, message: error.message };
 
   revalidatePath("/communities");
   return { success: true };

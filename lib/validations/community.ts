@@ -15,3 +15,12 @@ export const inviteClientSchema = z.object({
 });
 
 export type InviteClientInput = z.infer<typeof inviteClientSchema>;
+
+export const editClientSchema = z.object({
+  fullName: z.string().min(1, "Name is required"),
+  email: z.string().email("Enter a valid email address"),
+  clientType: z.enum(["homeowner", "hoa_director"]),
+  homeAddress: z.string().optional(),
+});
+
+export type EditClientInput = z.infer<typeof editClientSchema>;

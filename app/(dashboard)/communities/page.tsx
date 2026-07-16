@@ -30,7 +30,7 @@ export default async function CommunitiesPage() {
   const { data: clientProfiles } = userIds.length
     ? await supabase
         .from("profiles")
-        .select("id, full_name, email, client_type")
+        .select("id, full_name, email, client_type, home_address")
         .in("id", userIds)
     : { data: [] };
 
@@ -49,6 +49,7 @@ export default async function CommunitiesPage() {
           fullName: profile?.full_name ?? null,
           email: profile?.email ?? null,
           clientType: profile?.client_type ?? null,
+          homeAddress: profile?.home_address ?? null,
         };
       }),
   }));
