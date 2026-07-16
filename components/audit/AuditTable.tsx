@@ -20,12 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MOCK_AUDITS, type MockAuditRow } from "@/lib/mock-data";
+import type { AuditListRow } from "@/types/audit";
 import { AuditStatusBadge } from "./AuditStatusBadge";
 import { exportToCsv } from "@/lib/csv-export";
 
 type SortKey = keyof Pick<
-  MockAuditRow,
+  AuditListRow,
   "address" | "homeownerName" | "auditDate" | "auditorName" | "dollarSavingsPerYear" | "efficiencyScore"
 >;
 
@@ -38,7 +38,7 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "efficiencyScore", label: "Score" },
 ];
 
-export function AuditTable() {
+export function AuditTable({ audits }: { audits: AuditListRow[] }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("auditDate");
@@ -46,7 +46,7 @@ export function AuditTable() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return MOCK_AUDITS.filter((a) => {
+    return audits.filter((a) => {
       const matchesQuery =
         !q ||
         [a.address, a.homeownerName, a.homeId, a.builder, a.neighborhood, a.auditorName]
@@ -63,7 +63,7 @@ export function AuditTable() {
         : String(av).localeCompare(String(bv));
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [query, status, sortKey, sortDir]);
+  }, [audits, query, status, sortKey, sortDir]);
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {

@@ -70,6 +70,21 @@ export interface AuditCalculations {
 
 export type AuditStatus = "draft" | "in_progress" | "completed" | "reviewed";
 
+/** Flattened shape for the audit log table — one row per real `audits` record. */
+export interface AuditListRow {
+  id: string;
+  homeId: string;
+  address: string;
+  homeownerName: string;
+  builder: string;
+  neighborhood: string;
+  auditorName: string;
+  auditDate: string;
+  status: AuditStatus;
+  dollarSavingsPerYear: number;
+  efficiencyScore: number;
+}
+
 export type PhotoCategory =
   | "front_yard"
   | "backyard"
