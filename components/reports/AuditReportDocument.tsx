@@ -53,6 +53,18 @@ function ExteriorSummary({ exterior }: { exterior: ExteriorAudit }) {
       exterior.hasLeaks && "Leaks",
       exterior.brokenHeadCount ? `${exterior.brokenHeadCount} broken heads` : null,
     ].filter(Boolean).join(", ") || "None"],
+    ["Pool", exterior.hasPool
+      ? [
+          exterior.poolGallons ? `${exterior.poolGallons.toLocaleString()} gal capacity` : null,
+          exterior.poolGallonsUsedPerYear ? `${exterior.poolGallonsUsedPerYear.toLocaleString()} gal/yr used` : null,
+        ].filter(Boolean).join(", ") || "Yes"
+      : "None"],
+    ["Spa", exterior.hasSpa
+      ? [
+          exterior.spaGallons ? `${exterior.spaGallons.toLocaleString()} gal capacity` : null,
+          exterior.spaGallonsUsedPerYear ? `${exterior.spaGallonsUsedPerYear.toLocaleString()} gal/yr used` : null,
+        ].filter(Boolean).join(", ") || "Yes"
+      : "None"],
   ];
   return (
     <View style={styles.row}>

@@ -13,7 +13,12 @@ export interface ExteriorAudit {
   hasRunoff?: boolean;
   hasLeaks?: boolean;
   brokenHeadCount?: number;
-  hasPoolOrSpa?: boolean;
+  hasPool?: boolean;
+  poolGallons?: number;
+  poolGallonsUsedPerYear?: number;
+  hasSpa?: boolean;
+  spaGallons?: number;
+  spaGallonsUsedPerYear?: number;
   notes?: string;
 }
 

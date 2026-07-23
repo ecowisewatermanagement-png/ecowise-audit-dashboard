@@ -70,6 +70,8 @@ export function ExteriorStep({
   });
 
   const hasController = watch("hasIrrigationController");
+  const hasPool = watch("hasPool");
+  const hasSpa = watch("hasSpa");
 
   async function onSubmit(values: ExteriorInput) {
     const result = await updateExterior(auditId, values);
@@ -169,6 +171,52 @@ export function ExteriorStep({
               <Input id="controllerBrand" {...register("controllerBrand")} />
             </Field>
           )}
+
+          {hasPool && (
+            <>
+              <Field>
+                <FieldLabel htmlFor="poolGallons">Pool capacity (gallons)</FieldLabel>
+                <Input
+                  id="poolGallons"
+                  type="number"
+                  {...register("poolGallons", { valueAsNumber: true })}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="poolGallonsUsedPerYear">
+                  Pool water usage (gal/year)
+                </FieldLabel>
+                <Input
+                  id="poolGallonsUsedPerYear"
+                  type="number"
+                  {...register("poolGallonsUsedPerYear", { valueAsNumber: true })}
+                />
+              </Field>
+            </>
+          )}
+
+          {hasSpa && (
+            <>
+              <Field>
+                <FieldLabel htmlFor="spaGallons">Spa capacity (gallons)</FieldLabel>
+                <Input
+                  id="spaGallons"
+                  type="number"
+                  {...register("spaGallons", { valueAsNumber: true })}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="spaGallonsUsedPerYear">
+                  Spa water usage (gal/year)
+                </FieldLabel>
+                <Input
+                  id="spaGallonsUsedPerYear"
+                  type="number"
+                  {...register("spaGallonsUsedPerYear", { valueAsNumber: true })}
+                />
+              </Field>
+            </>
+          )}
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
@@ -181,7 +229,8 @@ export function ExteriorStep({
           <SwitchField control={control} name="hasOverspray" label="Overspray observed" />
           <SwitchField control={control} name="hasRunoff" label="Runoff observed" />
           <SwitchField control={control} name="hasLeaks" label="Irrigation leaks observed" />
-          <SwitchField control={control} name="hasPoolOrSpa" label="Pool / spa on property" />
+          <SwitchField control={control} name="hasPool" label="Pool on property" />
+          <SwitchField control={control} name="hasSpa" label="Spa on property" />
         </div>
 
         <Field>

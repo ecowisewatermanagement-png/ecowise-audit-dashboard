@@ -30,7 +30,12 @@ export const exteriorSchema = z.object({
   hasRunoff: z.boolean().optional(),
   hasLeaks: z.boolean().optional(),
   brokenHeadCount: z.number().min(0).optional(),
-  hasPoolOrSpa: z.boolean().optional(),
+  hasPool: z.boolean().optional(),
+  poolGallons: z.number().min(0).optional(),
+  poolGallonsUsedPerYear: z.number().min(0).optional(),
+  hasSpa: z.boolean().optional(),
+  spaGallons: z.number().min(0).optional(),
+  spaGallonsUsedPerYear: z.number().min(0).optional(),
   notes: z.string().optional(),
 });
 
