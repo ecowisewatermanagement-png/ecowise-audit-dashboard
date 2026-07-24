@@ -114,7 +114,7 @@ export function ClientSignupForm() {
           </FieldLabel>
           <Input
             id="requestedCommunity"
-            placeholder="e.g. Promontory"
+            placeholder="Community name"
             {...register("requestedCommunity")}
           />
           <FieldError errors={[errors.requestedCommunity]} />
