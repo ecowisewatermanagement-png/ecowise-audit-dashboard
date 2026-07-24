@@ -36,10 +36,17 @@ export interface ClientRow {
   clientType: ClientType | null;
   homeAddress: string | null;
   communities: string[];
+  communityIds: string[];
   pendingRequest: string | null;
 }
 
-export function ClientsTable({ clients }: { clients: ClientRow[] }) {
+export function ClientsTable({
+  clients,
+  allCommunities,
+}: {
+  clients: ClientRow[];
+  allCommunities: { id: string; name: string }[];
+}) {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<string>("all");
 
@@ -147,6 +154,8 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                     email={client.email}
                     clientType={client.clientType}
                     homeAddress={client.homeAddress}
+                    communities={allCommunities}
+                    currentCommunityIds={client.communityIds}
                   />
                 </TableCell>
               </TableRow>

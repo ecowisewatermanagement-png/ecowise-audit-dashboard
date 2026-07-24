@@ -7,12 +7,13 @@ import { Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 import { editClientSchema, type EditClientInput } from "@/lib/validations/community";
-import { updateClientProfile } from "@/app/(dashboard)/communities/actions";
+import { updateClientProfile, updateClientCommunities } from "@/app/(dashboard)/communities/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel, FieldError, FieldDescription } from "@/components/ui/field";
 import {
   Dialog,
   DialogContent,
@@ -31,14 +32,20 @@ export function EditClientDialog({
   email,
   clientType,
   homeAddress,
+  communities = [],
+  currentCommunityIds = [],
 }: {
   userId: string;
   fullName: string | null;
   email: string | null;
   clientType: ClientType | null;
   homeAddress: string | null;
+  /** All communities available to assign — omit to hide the community selector. */
+  communities?: { id: string; name: string }[];
+  currentCommunityIds?: string[];
 }) {
   const [open, setOpen] = useState(false);
+  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(currentCommunityIds);
 
   const {
     register,
@@ -56,9 +63,27 @@ export function EditClientDialog({
     },
   });
 
+  function resetAll() {
+    reset({
+      fullName: fullName ?? "",
+      email: email ?? "",
+      clientType: clientType ?? "homeowner",
+      homeAddress: homeAddress ?? "",
+    });
+    setSelectedCommunityIds(currentCommunityIds);
+  }
+
   async function onSubmit(values: EditClientInput) {
-    const result = await updateClientProfile(userId, values);
-    if (!result.success) return toast.error(result.message);
+    const [profileResult, communitiesResult] = await Promise.all([
+      updateClientProfile(userId, values),
+      communities.length > 0
+        ? updateClientCommunities(userId, selectedCommunityIds)
+        : Promise.resolve({ success: true as const }),
+    ]);
+
+    if (!profileResult.success) return toast.error(profileResult.message);
+    if (!communitiesResult.success) return toast.error(communitiesResult.message);
+
     toast.success("Client updated");
     setOpen(false);
   }
@@ -68,14 +93,7 @@ export function EditClientDialog({
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) {
-          reset({
-            fullName: fullName ?? "",
-            email: email ?? "",
-            clientType: clientType ?? "homeowner",
-            homeAddress: homeAddress ?? "",
-          });
-        }
+        if (!next) resetAll();
       }}
     >
       <DialogTrigger
@@ -142,6 +160,33 @@ export function EditClientDialog({
                 )}
               />
             </Field>
+
+            {communities.length > 0 && (
+              <Field>
+                <FieldLabel>Community</FieldLabel>
+                <FieldDescription>
+                  Fix this if they were added to the wrong community by mistake.
+                </FieldDescription>
+                <div className="flex flex-col gap-2 rounded-md border p-3">
+                  {communities.map((c) => {
+                    const checked = selectedCommunityIds.includes(c.id);
+                    return (
+                      <label key={c.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(value) => {
+                            setSelectedCommunityIds((prev) =>
+                              value ? [...prev, c.id] : prev.filter((id) => id !== c.id)
+                            );
+                          }}
+                        />
+                        {c.name}
+                      </label>
+                    );
+                  })}
+                </div>
+              </Field>
+            )}
           </FieldGroup>
 
           <DialogFooter className="mt-4">

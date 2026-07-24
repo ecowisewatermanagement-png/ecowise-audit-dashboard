@@ -36,6 +36,13 @@ export default async function CommunitiesPage() {
 
   const profileById = new Map((clientProfiles ?? []).map((p) => [p.id, p]));
 
+  const communityIdsByUser = new Map<string, string[]>();
+  for (const a of access ?? []) {
+    const list = communityIdsByUser.get(a.user_id) ?? [];
+    list.push(a.community_id);
+    communityIdsByUser.set(a.user_id, list);
+  }
+
   const communitiesWithClients = (communities ?? []).map((c) => ({
     id: c.id,
     name: c.name,
@@ -50,9 +57,12 @@ export default async function CommunitiesPage() {
           email: profile?.email ?? null,
           clientType: profile?.client_type ?? null,
           homeAddress: profile?.home_address ?? null,
+          communityIds: communityIdsByUser.get(a.user_id) ?? [],
         };
       }),
   }));
+
+  const allCommunities = (communities ?? []).map((c) => ({ id: c.id, name: c.name }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -78,7 +88,7 @@ export default async function CommunitiesPage() {
               clientType: p.client_type,
               homeAddress: p.home_address,
             }))}
-            communities={(communities ?? []).map((c) => ({ id: c.id, name: c.name }))}
+            communities={allCommunities}
           />
         </CardContent>
       </Card>
@@ -97,15 +107,13 @@ export default async function CommunitiesPage() {
           <CardTitle>Invite a client directly</CardTitle>
         </CardHeader>
         <CardContent>
-          <InviteClientForm
-            communities={(communities ?? []).map((c) => ({ id: c.id, name: c.name }))}
-          />
+          <InviteClientForm communities={allCommunities} />
         </CardContent>
       </Card>
 
       <div>
         <h2 className="mb-3 text-lg font-semibold">All communities</h2>
-        <CommunityList communities={communitiesWithClients} />
+        <CommunityList communities={communitiesWithClients} allCommunities={allCommunities} />
       </div>
     </div>
   );

@@ -24,12 +24,17 @@ export default async function ClientsPage() {
 
   const communityNameById = new Map((communities ?? []).map((c) => [c.id, c.name]));
   const communityNamesByUserId = new Map<string, string[]>();
+  const communityIdsByUserId = new Map<string, string[]>();
   for (const a of access ?? []) {
     const name = communityNameById.get(a.community_id);
-    if (!name) continue;
-    const list = communityNamesByUserId.get(a.user_id) ?? [];
-    list.push(name);
-    communityNamesByUserId.set(a.user_id, list);
+    if (name) {
+      const names = communityNamesByUserId.get(a.user_id) ?? [];
+      names.push(name);
+      communityNamesByUserId.set(a.user_id, names);
+    }
+    const ids = communityIdsByUserId.get(a.user_id) ?? [];
+    ids.push(a.community_id);
+    communityIdsByUserId.set(a.user_id, ids);
   }
 
   const rows: ClientRow[] = (clients ?? []).map((c) => ({
@@ -39,8 +44,11 @@ export default async function ClientsPage() {
     clientType: c.client_type,
     homeAddress: c.home_address,
     communities: communityNamesByUserId.get(c.id) ?? [],
+    communityIds: communityIdsByUserId.get(c.id) ?? [],
     pendingRequest: communityNamesByUserId.has(c.id) ? null : c.requested_community,
   }));
+
+  const allCommunities = (communities ?? []).map((c) => ({ id: c.id, name: c.name }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,7 +60,7 @@ export default async function ClientsPage() {
         </p>
       </div>
 
-      <ClientsTable clients={rows} />
+      <ClientsTable clients={rows} allCommunities={allCommunities} />
     </div>
   );
 }

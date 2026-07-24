@@ -28,13 +28,16 @@ export interface CommunityWithClients {
     email: string | null;
     clientType: ClientType | null;
     homeAddress: string | null;
+    communityIds: string[];
   }[];
 }
 
 export function CommunityList({
   communities,
+  allCommunities,
 }: {
   communities: CommunityWithClients[];
+  allCommunities: { id: string; name: string }[];
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -126,6 +129,8 @@ export function CommunityList({
                         email={client.email}
                         clientType={client.clientType}
                         homeAddress={client.homeAddress}
+                        communities={allCommunities}
+                        currentCommunityIds={client.communityIds}
                       />
                       <Button
                         type="button"

@@ -113,6 +113,7 @@ export async function approveClientRequest(
   await supabase.from("profiles").update({ requested_community: null }).eq("id", userId);
 
   revalidatePath("/communities");
+  revalidatePath("/clients");
   return { success: true };
 }
 
@@ -161,6 +162,34 @@ export async function updateClientProfile(
   if (error) return { success: false, message: error.message };
 
   revalidatePath("/communities");
+  revalidatePath("/clients");
+  return { success: true };
+}
+
+/** Admin-only — replaces a client's community assignments with exactly the given set. */
+export async function updateClientCommunities(
+  userId: string,
+  communityIds: string[]
+): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { error: deleteError } = await supabase
+    .from("community_access")
+    .delete()
+    .eq("user_id", userId);
+
+  if (deleteError) return { success: false, message: deleteError.message };
+
+  if (communityIds.length > 0) {
+    const { error: insertError } = await supabase.from("community_access").insert(
+      communityIds.map((communityId) => ({ user_id: userId, community_id: communityId }))
+    );
+    if (insertError) return { success: false, message: insertError.message };
+  }
+
+  revalidatePath("/communities");
+  revalidatePath("/clients");
   return { success: true };
 }
 
@@ -178,5 +207,6 @@ export async function revokeClientAccess(
 
   if (error) return { success: false, message: error.message };
   revalidatePath("/communities");
+  revalidatePath("/clients");
   return { success: true };
 }
