@@ -103,21 +103,17 @@ function InteriorSummary({ interior }: { interior: InteriorAudit }) {
   );
 }
 
-export function AuditReportDocument({
+export type AuditReportInput = Pick<
+  Audit,
+  "address" | "homeownerName" | "auditDate" | "exterior" | "interior" | "recommendations" | "calculations"
+>;
+
+export function AuditReportPage({
   audit,
   auditorName,
   logoUrl,
 }: {
-  audit: Pick<
-    Audit,
-    | "address"
-    | "homeownerName"
-    | "auditDate"
-    | "exterior"
-    | "interior"
-    | "recommendations"
-    | "calculations"
-  >;
+  audit: AuditReportInput;
   auditorName?: string | null;
   logoUrl: string;
 }) {
@@ -126,9 +122,8 @@ export function AuditReportDocument({
   const priorityRecs = recs.filter((r) => r.priority === "high");
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.headerRow}>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.headerRow}>
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image src={logoUrl} style={styles.logo} />
           <View>
@@ -213,10 +208,41 @@ export function AuditReportDocument({
           ))}
         </View>
 
-        <Text style={styles.footer}>
-          EcoWise Water Management · This report is an estimate based on a visual audit and standard fixture usage assumptions.
-        </Text>
-      </Page>
+      <Text style={styles.footer}>
+        EcoWise Water Management · This report is an estimate based on a visual audit and standard fixture usage assumptions.
+      </Text>
+    </Page>
+  );
+}
+
+export function AuditReportDocument({
+  audit,
+  auditorName,
+  logoUrl,
+}: {
+  audit: AuditReportInput;
+  auditorName?: string | null;
+  logoUrl: string;
+}) {
+  return (
+    <Document>
+      <AuditReportPage audit={audit} auditorName={auditorName} logoUrl={logoUrl} />
+    </Document>
+  );
+}
+
+export function CommunityAuditsBundleDocument({
+  audits,
+  logoUrl,
+}: {
+  audits: (AuditReportInput & { id: string; auditorName?: string | null })[];
+  logoUrl: string;
+}) {
+  return (
+    <Document>
+      {audits.map((audit) => (
+        <AuditReportPage key={audit.id} audit={audit} auditorName={audit.auditorName} logoUrl={logoUrl} />
+      ))}
     </Document>
   );
 }

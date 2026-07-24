@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Card, CardContent } from "@/components/ui/card";
+import { AuditFullDetail } from "./AuditFullDetail";
 import type { Audit } from "@/types/audit";
 
 const DownloadReportButton = dynamic(
@@ -50,6 +51,12 @@ export function MyHomeSummary({
       <div>
         <DownloadReportButton audit={audit} auditorName={auditorName} />
       </div>
+
+      <AuditFullDetail
+        exterior={audit.exterior}
+        interior={audit.interior}
+        recommendations={audit.recommendations}
+      />
     </div>
   );
 }

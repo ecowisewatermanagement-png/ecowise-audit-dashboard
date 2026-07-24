@@ -19,13 +19,7 @@ export default async function LoginPage({
       </p>
       <LoginForm redirectTo={redirectTo} />
       <p className="text-muted-foreground mt-6 text-center text-sm">
-        EcoWise staff, no account yet?{" "}
-        <Link href="/signup" className="text-primary underline">
-          Create one
-        </Link>
-      </p>
-      <p className="text-muted-foreground mt-2 text-center text-sm">
-        Community member?{" "}
+        Community member, no account yet?{" "}
         <Link href="/join" className="text-primary underline">
           Sign up here
         </Link>
